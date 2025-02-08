@@ -1,0 +1,38 @@
+name: "Gallery Metadata Populator"
+description: "Automatically creates placeholder scenes, scrapes metadata, and copies to galleries."
+author: "Your Name (or leave blank)"
+version: "1.1"
+
+scrapers:
+  - id: "gallery_metadata"
+    name: "Gallery Metadata Populator"
+    description: "Scrapes metadata for galleries by creating placeholder scenes and transferring metadata."
+    content_type: "SCENE"
+    triggers:
+      - type: "MISSING_METADATA"
+    actions:
+      - type: "CREATE_SCENE"
+        conditions:
+          - field: "gallery.metadata"
+            operator: "IS_EMPTY"
+        output:
+          - field: "scene.title"
+            value: "Placeholder for {gallery.title}"
+
+      - type: "SCRAPE"
+        target: "theporndb"
+        conditions:
+          - field: "scene.metadata"
+            operator: "IS_EMPTY"
+
+      - type: "COPY_TO_GALLERY"
+        conditions:
+          - field: "scene.metadata"
+            operator: "IS_NOT_EMPTY"
+
+      - type: "DELETE_SCENE"
+        conditions:
+          - field: "scene.metadata"
+            operator: "IS_NOT_EMPTY"
+          - field: "gallery.metadata"
+            operator: "IS_NOT_EMPTY"
